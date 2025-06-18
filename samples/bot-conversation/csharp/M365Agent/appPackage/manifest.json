@@ -2,7 +2,7 @@
   "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.19/MicrosoftTeams.schema.json",
   "manifestVersion": "1.19",
   "version": "1.0.0",
-  "id": "${{TEAMS_APP_ID}}",
+  "id": "9d8e4c67-5a05-416a-bb3b-440c532c2f31",
   "developer": {
     "name": "TeamsConversationBot",
     "websiteUrl": "https://www.microsoft.com",
@@ -24,7 +24,7 @@
   "accentColor": "#FFFFFF",
   "bots": [
     {
-      "botId": "${{AAD_APP_CLIENT_ID}}",
+      "botId": "9d8e4c67-5a05-416a-bb3b-440c532c2f31",
       "scopes": [
         "personal",
         "groupChat",
@@ -102,7 +102,9 @@
     }
   },
   "validDomains": [
-    "${{BOT_DOMAIN}}",
-    "*.ngrok-free.app"
+    "localhost:7130",
+    "8t12m9sn-7130.use.devtunnels.ms",
+    "hammersoftware.ca",
+    "simbiotix.com"
   ]
 }
