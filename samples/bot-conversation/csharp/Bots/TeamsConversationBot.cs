@@ -19,9 +19,6 @@ using AdaptiveCards.Templating;
 using Newtonsoft.Json;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using System.Collections.Concurrent;
-using System.Collections;
-using Microsoft.AspNetCore.Http;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Microsoft.BotBuilderSamples.Bots
 {
@@ -29,10 +26,10 @@ namespace Microsoft.BotBuilderSamples.Bots
     {
         private string _appId;
         private string _appPassword;
-        private static int _counter = 0;
-        private static List<string> users = new List<string>();
-        private static ConcurrentDictionary<string, TeamsChannelAccount> teamMemberDetails = new ConcurrentDictionary<string, TeamsChannelAccount>();
-        private static ConcurrentDictionary<string, string> teamMemberMessageIdDetails = new ConcurrentDictionary<string, string>();
+        private static int _counter;
+        private static List<string> _users = new List<string>();
+        private static ConcurrentDictionary<string, TeamsChannelAccount> _teamMemberDetails = new ConcurrentDictionary<string, TeamsChannelAccount>();
+        private static ConcurrentDictionary<string, string> _teamMemberMessageIdDetails = new ConcurrentDictionary<string, string>();
 
         public TeamsConversationBot(IConfiguration config)
         {
@@ -282,9 +279,9 @@ namespace Microsoft.BotBuilderSamples.Bots
         /// <returns>A task that represents the work queued to execute.</returns>
         private async Task CheckReadUserCount(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            if (teamMemberDetails.Count != 0)
+            if (_teamMemberDetails.Count != 0)
             {
-                var userList = string.Join(", ", users);
+                var userList = string.Join(", ", _users);
                 await turnContext.SendActivityAsync(MessageFactory.Text($"Number of members read the message : {_counter} \n\n Members : {userList}"), cancellationToken);
             }
             else
@@ -301,27 +298,31 @@ namespace Microsoft.BotBuilderSamples.Bots
         /// <returns>A task that represents the work queued to execute.</returns>
         private async Task ResetReadUserCount(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            teamMemberDetails = new ConcurrentDictionary<string, TeamsChannelAccount>();
+            _teamMemberDetails = new ConcurrentDictionary<string, TeamsChannelAccount>();
             _counter = 0;
-            users = new List<string>();
-            teamMemberMessageIdDetails = new ConcurrentDictionary<string, string>();
+            _users = new List<string>();
+            _teamMemberMessageIdDetails = new ConcurrentDictionary<string, string>();
         }
 
         /// <summary>
         /// Invoked when user read the message sent by bot in personal scope
         /// </summary>
+        /// <param name="readReceiptInfo"></param>
         /// <param name="turnContext"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>A task that represents the work queued to execute.</returns>
         protected override async Task OnTeamsReadReceiptAsync(ReadReceiptInfo readReceiptInfo, ITurnContext<IEventActivity> turnContext, CancellationToken cancellationToken)
         {
-            teamMemberMessageIdDetails.TryGetValue(turnContext.Activity.From.AadObjectId, out string messageId);
+            _teamMemberMessageIdDetails.TryGetValue(turnContext.Activity.From.AadObjectId, out string messageId);
             if (readReceiptInfo.IsMessageRead(messageId))
             {
-                teamMemberDetails.TryGetValue(turnContext.Activity.From.AadObjectId, out TeamsChannelAccount memberDetails);
+                _teamMemberDetails.TryGetValue(turnContext.Activity.From.AadObjectId, out TeamsChannelAccount memberDetails);
                 _counter++;
-                users.Add(memberDetails.Name);
-                teamMemberMessageIdDetails.TryRemove(turnContext.Activity.From.AadObjectId, out string valueRemoved);
+                if(memberDetails != null)
+                {
+                    _users.Add(memberDetails.Name);
+                }
+                _teamMemberMessageIdDetails.TryRemove(turnContext.Activity.From.AadObjectId, out string valueRemoved);
             }
         }
 
@@ -454,7 +455,7 @@ namespace Microsoft.BotBuilderSamples.Bots
                 }
                 else
                 {
-                    throw e;
+                    throw new ErrorResponseException(e.Body.Error.Message, e);
                 }
             }
 
@@ -513,8 +514,8 @@ namespace Microsoft.BotBuilderSamples.Bots
                            async (t2, c2) =>
                            {
                                var message = await t2.SendActivityAsync(proactiveMessage, c2);
-                               teamMemberDetails.TryAdd(teamMember.AadObjectId, teamMember);
-                               teamMemberMessageIdDetails.TryAdd(teamMember.AadObjectId, message.Id);
+                               _teamMemberDetails.TryAdd(teamMember.AadObjectId, teamMember);
+                               _teamMemberMessageIdDetails.TryAdd(teamMember.AadObjectId, message.Id);
                            },
                            cancellationToken);
                    },
@@ -528,7 +529,7 @@ namespace Microsoft.BotBuilderSamples.Bots
 
             }
 
-            await turnContext.SendActivityAsync(MessageFactory.Text($"All messages have been sent to {teamMemberDetails.Count} members."), cancellationToken);
+            await turnContext.SendActivityAsync(MessageFactory.Text($"All messages have been sent to {_teamMemberDetails.Count} members."), cancellationToken);
         }
 
         private static async Task<List<TeamsChannelAccount>> GetPagedMembers(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
@@ -604,7 +605,7 @@ namespace Microsoft.BotBuilderSamples.Bots
                 }
                 else
                 {
-                    throw e;
+                    throw new ErrorResponseException(e.Body.Error.Message, e);
                 }
             }
 
