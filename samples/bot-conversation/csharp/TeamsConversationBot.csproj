@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
@@ -74,5 +74,19 @@
     <None Update="M365AgentManifest\icon-outline.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="DeploymentTemplates\DeployUseExistResourceGroup\parameters-for-template-AzureBot-with-rg.json" />
+    <_ContentIncludedByDefault Remove="DeploymentTemplates\DeployUseExistResourceGroup\parameters-for-template-BotApp-with-rg.json" />
+    <_ContentIncludedByDefault Remove="DeploymentTemplates\DeployUseExistResourceGroup\template-AzureBot-with-rg.json" />
+    <_ContentIncludedByDefault Remove="DeploymentTemplates\DeployUseExistResourceGroup\template-BotApp-with-rg.json" />
+    <_ContentIncludedByDefault Remove="DeploymentTemplates\DeployWithNewResourceGroup\parameters-for-template-AzureBot-new-rg.json" />
+    <_ContentIncludedByDefault Remove="DeploymentTemplates\DeployWithNewResourceGroup\parameters-for-template-BotApp-new-rg.json" />
+    <_ContentIncludedByDefault Remove="DeploymentTemplates\DeployWithNewResourceGroup\template-AzureBot-new-rg.json" />
+    <_ContentIncludedByDefault Remove="DeploymentTemplates\DeployWithNewResourceGroup\template-BotApp-new-rg.json" />
+    <_ContentIncludedByDefault Remove="M365Agent\appPackage\manifest.json" />
+    <_ContentIncludedByDefault Remove="M365Agent\infra\azure.parameters.json" />
+    <_ContentIncludedByDefault Remove="M365Agent\launchSettings.json" />
   </ItemGroup>
 </Project>
